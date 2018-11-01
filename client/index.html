@@ -1,0 +1,109 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <style>
+    html, body {
+      padding: 0;
+      margin: 0;
+    }
+    body {
+      font-family: sans-serif;
+      font-size: 16px;
+    }
+    .columns {
+      display: flex;
+      flex-direction: row;
+      position: absolute;
+    }
+    .column {
+      width: 300px;
+      vertical-align: top;
+      margin: 0 20px;
+    }
+    .page:not(:first-child) {
+      margin-top: 100px;
+    }
+    .page img {
+      width: 100%;
+    }
+    .page p.header {
+      font-size: 14px;
+      font-weight: normal;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="columns" id="columns">
+    </div>
+  </div>
+  <script>
+    const baseDir = './screenshots/latest';
+
+    const req = new XMLHttpRequest();
+    req.addEventListener('load', function() {
+      let results, error;
+      try {
+        results = JSON.parse(req.responseText);
+      } catch(err) {
+        error = err;
+      }
+      onPagesLoaded(error, results);
+    });
+    req.open('GET', baseDir + '/pages.json');
+    req.send();
+
+    function onPagesLoaded(error, pages) {
+      if (error) {
+        console.error(error);
+        return;
+      }
+      console.log(pages);
+
+      let currentColumn;
+      let lastSlugParts = [];
+
+      pages.forEach(page => {
+        let makeNewColumn = !currentColumn;
+
+        const slug = page.url.replace(/https:\/\//, '');
+        console.log(slug);
+        let slugParts = slug.split('/');
+        if (slugParts.length <= 1) {
+          makeNewColumn = true;
+        } else {
+          if (slugParts[0] !== lastSlugParts[0] ||
+            slugParts[1] !== lastSlugParts[1]
+          ) {
+            makeNewColumn = true;
+          }
+        }
+        lastSlugParts = slugParts;
+
+        if (makeNewColumn) {
+          console.log('making new column');
+          currentColumn = document.createElement('div');
+          currentColumn.className = 'column';
+          document.getElementById('columns').appendChild(currentColumn);
+        }
+
+        const pageContainer = document.createElement('div');
+        pageContainer.className = 'page';
+
+        const header = document.createElement('p');
+        header.className = 'header';
+        header.innerText = '/' + slugParts.slice(1).join('/');
+        pageContainer.appendChild(header);
+
+        const img = document.createElement('img');
+        img.src = baseDir + '/' + page.filename;
+        pageContainer.appendChild(img);
+
+        currentColumn.appendChild(pageContainer);
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "name": "sitemap-to-screenshots",
+  "version": "1.0.0",
+  "author": "Niclas Snellman",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "fs-extra": "^7.0.0",
+    "puppeteer": "^1.8.0",
+    "request": "^2.88.0",
+    "xml2js": "^0.4.19"
+  }
+}
